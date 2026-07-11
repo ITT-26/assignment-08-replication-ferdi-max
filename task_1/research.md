@@ -32,3 +32,10 @@ Voice as sound: using non-verbal voice input for interactive control. </br>
 In Proceedings of the 14th annual ACM symposium on User interface software and technology (UIST '01). </br>
 Association for Computing Machinery, New York, NY, USA, 155–156. </br>
 https://doi.org/10.1145/502348.502372
+
+
+Ann-Sophie L. Schenk, Martin Schymiczek Larangeira de Almeida, Ilknur Sitil, and Xiying Li. 2026. </br>
+Bickering Benches: Exploring Playful Interaction in Post-Anthropocentric HRI. </br>
+In Companion Proceedings of the 21st ACM/IEEE International Conference on Human-Robot Interaction (HRI Companion '26). </br>
+Association for Computing Machinery, New York, NY, USA, 1237–1240. </br>
+https://doi.org/10.1145/3776734.3794604
