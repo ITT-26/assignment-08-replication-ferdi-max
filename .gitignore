@@ -1,2 +1,4 @@
-task_2/bickering_chairs/*
-!task_2/bickering_chairs/README.md
+venv
+task_2/bickering_chairs/models/kokoro-v1.0.fp16-gpu.onnx
+task_2/bickering_chairs/models/kokoro-v1.0.onnx
+task_2/bickering_chairs/models/voices-v1.0.bin
