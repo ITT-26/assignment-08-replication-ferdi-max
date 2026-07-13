@@ -2,3 +2,5 @@ venv
 task_2/bickering_chairs/models/kokoro-v1.0.fp16-gpu.onnx
 task_2/bickering_chairs/models/kokoro-v1.0.onnx
 task_2/bickering_chairs/models/voices-v1.0.bin
+task_2/gesture_recognition/data
+.DS_Store*
