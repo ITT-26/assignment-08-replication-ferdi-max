@@ -5,7 +5,12 @@ import xml.etree.ElementTree as ET
 import pyglet
 import time as time
 
-ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+GESTURE_NAMES = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ") + [
+    "and",
+    "end",
+    "delete",
+    "restart",
+]
 XML_LOGS_OWN = 'task_2/air_writing/datasets'
 
 
@@ -35,10 +40,10 @@ class GestureInputApp:
         self.points = []
         self.draw_points = []
         self.timestamps = []
-        self.alphabet_index = 0
-        self.current_letter = ALPHABET[self.alphabet_index]
+        self.gesture_index = 0
+        self.current_gesture = GESTURE_NAMES[self.gesture_index]
         self.gesture_label = pyglet.text.Label(
-            f"Draw {self.current_letter} — press S to save",
+            f"Draw {self.current_gesture} — press S to save",
             font_size=24,
             x=40,
             y=self.height - 60
@@ -88,7 +93,7 @@ class GestureInputApp:
         os.makedirs(XML_LOGS_OWN, exist_ok=True)
 
         root = ET.Element("Gesture", {
-            "Name": self.current_letter,
+            "Name": self.current_gesture,
             "NumPts": str(len(self.points))
         })
         for i, p in enumerate(self.points):
@@ -99,16 +104,16 @@ class GestureInputApp:
 
         tree = ET.ElementTree(root)
         ET.indent(tree, space="  ")
-        tree.write(f"{XML_LOGS_OWN}/{get_next_file_name(self.current_letter)}",
+        tree.write(f"{XML_LOGS_OWN}/{get_next_file_name(self.current_gesture)}",
                    encoding='utf-8', xml_declaration=True)
 
         self.reset_current_gesture()
         
-    def next_letter(self):
-        self.alphabet_index = (self.alphabet_index + 1) % len(ALPHABET)
-        self.current_letter = ALPHABET[self.alphabet_index]
+    def next_gesture(self):
+        self.gesture_index = (self.gesture_index + 1) % len(GESTURE_NAMES)
+        self.current_gesture = GESTURE_NAMES[self.gesture_index]
         self.reset_current_gesture()
-        self.gesture_label.text = f"Draw {self.current_letter} — press S to save"
+        self.gesture_label.text = f"Draw {self.current_gesture} — press S to save"
 
 def main():
     app = GestureInputApp()
@@ -141,7 +146,7 @@ def main():
         if symbol == pyglet.window.key.R:
             app.reset_current_gesture()
         if symbol == pyglet.window.key.N:
-            app.next_letter()
+            app.next_gesture()
 
     pyglet.app.run()
 

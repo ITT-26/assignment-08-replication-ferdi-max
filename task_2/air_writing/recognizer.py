@@ -25,8 +25,8 @@ class Unistroke:
     def __init__(self, name, points):
         self.name = name
         self.points = resample(points, NUMPOINTS)
-        self.radians = indicativeAngle(self.points)
-        self.points = rotateBy(self.points, -self.radians)
+        self.radians = 0.0 #indicativeAngle(self.points)
+        #self.points = rotateBy(self.points, -self.radians)
         self.points = scaleTo(self.points, SQUARE_SIZE)
         self.points = translateTo(self.points, ORIGIN)
         self.vector = vectorize(self.points)
@@ -72,9 +72,9 @@ class DollarRecognizer:
                 d = optimalCosineDistance(
                     self.unistrokes[i].vector, candidate.vector)
             else:
-                d = distanceAtBestAngle(
-                    candidate.points, self.unistrokes[i], -ANGLE_RANGE, ANGLE_RANGE, ANGLE_PRECISION)
-
+                #d = distanceAtBestAngle(
+                #    candidate.points, self.unistrokes[i], -ANGLE_RANGE, ANGLE_RANGE, ANGLE_PRECISION)
+                d = pathDistance(candidate.points, self.unistrokes[i].points)
             if d < b:
                 b = d
                 u = i

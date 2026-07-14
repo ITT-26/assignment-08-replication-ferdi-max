@@ -1,6 +1,5 @@
 import os
 import cv2
-import numpy as np
 import xml.etree.ElementTree as ET
 import pyglet
 import math
@@ -13,11 +12,29 @@ from mediapipe.tasks.python import vision
 from collections import deque
 from recognizer import DollarRecognizer, Point
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-MEDIAPIPE_HAND_LANDMARK_MODEL_PATH = "hand_landmarker.task"
-XML_LOGS = 'task_2/air_writing/datasets'
-NUMBER_OF_POINTS = 64
-LETTERS_TO_TRAIN = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+parser = argparse.ArgumentParser(description='Air Writing Application')
+parser.add_argument('--mac_os', action='store_true',
+                    help='Set this flag if running on macOS')
+
+parser.add_argument('--xml_logs', type=str, default=os.path.join(BASE_DIR, "datasets"),
+                    help='Path to XML logs for training the recognizer')
+parser.add_argument('--mediapipe_model', type=str, default=os.path.join(BASE_DIR, "hand_landmarker.task"),
+                    help='Path to MediaPipe Hand Landmark model')
+args = parser.parse_args()
+
+
+mac_os = args.mac_os
+
+MEDIAPIPE_HAND_LANDMARK_MODEL_PATH = args.mediapipe_model
+XML_LOGS = args.xml_logs
+GESTURES_TO_TRAIN = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ") + [
+    "and",
+    "end",
+    "delete",
+    "restart",
+]
 
 
 def train_recognizer(recognizer):
@@ -26,7 +43,7 @@ def train_recognizer(recognizer):
             if '.xml' in f:
                 fname = f.split('.')[0]
                 label = fname.rsplit("_", 1)[0]
-                if label not in LETTERS_TO_TRAIN:
+                if label not in GESTURES_TO_TRAIN:
                     continue
 
                 xml_root = ET.parse(f'{root}/{f}').getroot()
@@ -46,9 +63,8 @@ class HandDetector:
     """
 
     def __init__(self):
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-        model_path = os.path.join(base_dir, MEDIAPIPE_HAND_LANDMARK_MODEL_PATH)
-        base_options = python.BaseOptions(model_asset_path=model_path)
+        base_options = python.BaseOptions(
+            model_asset_path=MEDIAPIPE_HAND_LANDMARK_MODEL_PATH)
         options = vision.HandLandmarkerOptions(
             base_options=base_options, num_hands=2)
         self.detector = vision.HandLandmarker.create_from_options(options)
@@ -90,7 +106,7 @@ class HandDetector:
 
 class WritingApp:
 
-    def __init__(self, video_id=0, mac_os=True):
+    def __init__(self, video_id=0, mac_os=mac_os):
         self.video_id = video_id
         self.detector = HandDetector()
         self.recognizer = DollarRecognizer()
@@ -100,21 +116,20 @@ class WritingApp:
         self.height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.is_writing = False
         self.points = deque(maxlen=512)
-        self.ar_threshold = 1.2
         self.reference_point = None
         self.current_frame = None
         self.region_factor = 0.2
         self.selected_color = (0, 255, 255)
         self.is_erasing = False
         self.pen_size = 12
-        self.fps = None
         self.current_stroke = []
-        self.detected_letter = None
+        self.info_text = ""
         self.pen_down_frame = 0
         self.pen_down_frames_threshold = 5
+        self.sentence = ""
         if mac_os:
             self.window = pyglet.window.Window(
-                (self.width / 2), (self.height / 2))
+                (self.width // 2), (self.height // 2))
         else:
             self.window = pyglet.window.Window(self.width, self.height)
         self.setup_tools()
@@ -188,12 +203,15 @@ class WritingApp:
             if self.reference_point is not None:
                 cv2.circle(frame, self.reference_point,
                            self.pen_size, self.selected_color, -1)
-            cv2.putText(frame, f"FPS: {self.fps:.2f}", (10, 70),
-                        cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
             self.draw_points(frame)
-            if self.detected_letter is not None:
-                cv2.putText(frame, f"Detected: {self.detected_letter}", (10, 400),
+            if self.info_text is not None:
+                cv2.putText(frame, f"{self.info_text}", (10, 400),
                             cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2, cv2.LINE_AA)
+
+            if self.sentence is not None:
+                cv2.putText(frame, f"{self.sentence}", (10, self.height - 150),
+                            cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2, cv2.LINE_AA)
+
             img = cv2glet(frame, 'BGR')
             img.blit(0, 0, 0)
 
@@ -220,12 +238,16 @@ class WritingApp:
         self.current_frame = frame
 
         if box is not None:
-            # Hand is dtetected, get the reference point and check if it's in the writing region
-            self.reference_point = self.get_reference_point(box)
+            # Hand is detetected, get the reference point and check if it's in the writing region
+            self.reference_point = self.get_reference_point(hand_landmarks)
 
             if self.reference_point[1] >= self.height * self.region_factor:
                 # Hand is in the writing region, check if it's writing or erasing
-                self.is_writing = self.aspect_ratio_greater_than_threshold(box)
+                extended_fingers = self.get_extended_fingers(hand_landmarks)
+                if len(extended_fingers) == 1 and 8 in extended_fingers:
+                    self.is_writing = True
+                else:
+                    self.is_writing = False
 
                 if self.is_erasing:
                     self.is_writing = False
@@ -301,39 +323,56 @@ class WritingApp:
             return
 
         points_copy = self.convert_stroke_to_points()
-        result = self.recognizer.recognize(points_copy, useProtractor=True)
-        self.detected_letter = result.name
+        result = self.recognizer.recognize(points_copy, useProtractor=False)
+        self.handle_recognition_result(result)
+
         print(f"Detected letter: {result.name} with score: {result.score:.2f}")
         self.current_stroke.clear()
+
+    def handle_recognition_result(self, result):
+        if result.score < 0.8:
+            self.info_text = "Please try again!"
+            print("Please, try again!")
+            return
+
+        if result.name == "delete":
+            self.sentence = self.sentence[:-1]
+            self.info_text = "Deleted last character"
+            self.points.clear()
+
+        elif result.name == "restart":
+            self.info_text = "Deleted sentence"
+            self.sentence = ""
+            self.points.clear()
+
+        elif result.name == "and":
+            self.info_text = "Added Space"
+            self.sentence += " "
+            pass
+
+        elif result.name == "end":
+            self.info_text = "Added Period"
+            self.sentence += "."
+            pass
+
+        if (result.name is not None and result.name not in ["delete", "restart", "and", "end"]):
+            self.info_text = "Detected letter: " + result.name
+            self.sentence += result.name
 
     def convert_stroke_to_points(self):
         points = []
         for p in self.current_stroke:
-            points.append(Point(p[0], (self.height - p[1])))
+            points.append(Point(p[0], p[1]))
         return points
 
     def add_breakpoint(self):
         if self.points and self.points[-1] is not None:
             self.points.append(None)
 
-    def get_aspect_ratio(self, box):
-        x1, y1, x2, y2 = box
-        width = x2 - x1
-        height = y2 - y1
-
-        if width <= 0:
-            return
-
-        return height / width
-
-    def aspect_ratio_greater_than_threshold(self, box):
-        aspect_ratio = self.get_aspect_ratio(box)
-        return aspect_ratio > self.ar_threshold
-
-    def get_reference_point(self, box):
-        x1, y1, x2, y2 = box
-        x = (x1 + x2) // 2
-        y = y1
+    def get_reference_point(self, hand_landmarks):
+        index_finger_tip = hand_landmarks[8]
+        x = int(index_finger_tip.x * self.width)
+        y = int(index_finger_tip.y * self.height)
         return (x, y)
 
     def check_tool_selection(self):
@@ -364,6 +403,27 @@ class WritingApp:
 
         self.points = deque(points, maxlen=self.points.maxlen)
 
+    def get_extended_fingers(self, hand_landmarks):
+        finger_landmarks = [
+            (8, 6),    # Index
+            (12, 10),  # Middle
+            (16, 14),  # Ring
+            (20, 18)   # Pinky
+        ]
+
+        extended_fingers = []
+
+        for finger in finger_landmarks:
+            tip_index = finger[0]
+            pip_index = finger[1]
+            finger_tip = hand_landmarks[tip_index]
+            finger_joint = hand_landmarks[pip_index]
+
+            if finger_tip.y < finger_joint.y:
+                extended_fingers.append(tip_index)
+
+        return extended_fingers
+
 
 def cv2glet(img, fmt):
     '''Assumes image is in BGR color space. Returns a pyimg object'''
@@ -387,6 +447,11 @@ def cv2glet(img, fmt):
 
 def main():
     app = WritingApp()
+
+    @app.window.event
+    def on_close():
+        app.cap.release()
+        app.detector.detector.close()
 
     @app.window.event
     def on_draw():
