@@ -12,10 +12,10 @@ open command and run
     ollama pull llama3.1 
     ````
 - Requires CUDA-Toolkit for the kokoro GPU-Model (really a pain to install correctly)
-    > [!WARNING]  
-    > Without CUDA-Toolkit the speech-Model could be slower
-    CPU-Kokoru model could be faster: https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx  
-    **(need to comment in code in audio_logic.py and move kokoro-v1.0.onnx in models folder!)**  
+> [!IMPORTANT]    
+> Without CUDA-Toolkit the speech-Model could be slower
+> CPU-Kokoru model could be faster: https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.onnx
+> **(need to comment in code in audio_logic.py and move kokoro-v1.0.onnx in models folder!)**  
     
 - Other requirements are cmake, visual-studio build-tools (c++)
 - if dlib doesn't install (needed for face_recognition) => install setuptools version 70.0 or lower, higher versions didn't work for me
