@@ -330,7 +330,7 @@ class WritingApp:
         self.current_stroke.clear()
 
     def handle_recognition_result(self, result):
-        if result.score < 0.8:
+        if result.score < 0.75:
             self.info_text = "Please try again!"
             print("Please, try again!")
             return
