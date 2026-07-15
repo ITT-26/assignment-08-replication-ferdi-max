@@ -11,6 +11,7 @@ class ChairState:
     generate_voice: bool = False
     listening: bool = False
     
+    request_text: str = ""
     subtitles: str = ""
     next_comment_time: float = 0.0
     next_mood_time: float = 0.0

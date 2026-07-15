@@ -53,6 +53,9 @@ def add_infoText(frame, state:ChairState, vision):
     cv2.putText(frame, character_text_A, (frame_width - longer_text_width - 15, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
     cv2.putText(frame, "Space: Talk to Chairs", (10, frame_height - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
 
+    if state.request_text != "":
+        t_length, _ = cv2.getTextSize(f"Request: {state.request_text}", cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)
+        cv2.putText(frame, f"Request: {state.request_text}", (frame_width - t_length - 10, frame_height - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
     #If i let kokoro generate by sentence and not whole response at once =>
     #if state.subtitles:
     #    (text_width, _), _ = cv2.getTextSize(state.subtitles, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)

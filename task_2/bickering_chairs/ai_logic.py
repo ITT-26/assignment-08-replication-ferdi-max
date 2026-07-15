@@ -139,9 +139,9 @@ class ChairAILogic:
         successful = self.speaker.speak(cleaned_A, state.character_A, "A", state)
         #If canceled remove from history
         if successful:
+            #if last_words_from_B != "": 
             self.history_A.append({"role": "user", "content": last_words_from_B})
             self.history_A.append({"role": "assistant", "content": cleaned_A})
-            return
         
         #--- CHARACTER B (Double Mode Only) ---
         if state.mode is Mode.DOUBLE:
@@ -174,7 +174,6 @@ class ChairAILogic:
             if successful:
                 self.history_B.append({"role": "user", "content": f"[CHAIR A JUST SAID]: '{cleaned_A}'"})
                 self.history_B.append({"role": "assistant", "content": cleaned_B})
-                return
 
         if len(self.history_A) > HISTORY_LIMIT: self.history_A = self.history_A[-HISTORY_LIMIT:]
         if len(self.history_B) > HISTORY_LIMIT: self.history_B = self.history_B[-HISTORY_LIMIT:]
@@ -219,7 +218,6 @@ class ChairAILogic:
         if successful:
             history.append({"role": "user", "content": visuals})
             history.append({"role": "assistant", "content": cleaned})
-            return
         
         if len(self.history_A) > HISTORY_LIMIT: self.history_A = self.history_A[-HISTORY_LIMIT:]
         if len(self.history_B) > HISTORY_LIMIT: self.history_B = self.history_B[-HISTORY_LIMIT:]
@@ -286,10 +284,10 @@ class ChairAILogic:
 
         state.talking_person = -1
         successfull = self.speaker.speak(cleaned, character, char_letter, state)
+        state.request_text = ""
         if successfull:
             history.append({"role": "user", "content": visuals})
             history.append({"role": "assistant", "content": cleaned})
-            return
         if len(self.history_A) > HISTORY_LIMIT: self.history_A = self.history_A[-HISTORY_LIMIT:]
         if len(self.history_B) > HISTORY_LIMIT: self.history_B = self.history_B[-HISTORY_LIMIT:]
         

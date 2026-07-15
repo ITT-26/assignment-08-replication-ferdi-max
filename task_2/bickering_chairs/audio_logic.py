@@ -103,6 +103,7 @@ class ChairAudio:
                     self.cancelToken = False
                     return None
                 
+                state.request_text = text
                 print(f"Understood: '{text}'")
                 state.listening = False
                 return text
