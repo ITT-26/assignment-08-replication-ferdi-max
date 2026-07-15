@@ -6,6 +6,10 @@ import speech_recognition as sr
 from spellchecker import SpellChecker
 import numpy as np
 import time
+import os
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+target_dir = os.path.join(script_dir, "models")
 
 class ChairAudio:
     def __init__(self):
@@ -13,13 +17,17 @@ class ChairAudio:
         self.recognizer = sr.Recognizer()
         self.recognizer.pause_threshold = 1.0
         session = onnxruntime.InferenceSession(
-            "models/kokoro-v1.0.fp16-gpu.onnx", 
-            providers=['CUDAExecutionProvider']
+            f"{target_dir}/kokoro-v1.0.fp16-gpu.onnx", 
+            providers=['CUDAExecutionProvider', 'CPUExecutionProvider']
         )
-        self.kokoro = Kokoro.from_session(session, "models/voices-v1.0.bin") #Only use with dedicated gpu
+        self.kokoro = Kokoro.from_session(session, f"{target_dir}/voices-v1.0.bin") #Better used with dedicated gpu
         self.cancelToken = False
+        print(f"⚠️  Kokoro uses Provider: {session.get_providers()[0]}")
 
-        #-------Non GPU Models---------------
+        
+        #-------Non GPU Models (Comment in if needed)---------------
+        #Tested it and at least for me using the GPU-model with CPU-Provider wasn't much slower than the CPU standard Model
+        
         #self.kokoro = Kokoro("models/kokoro-v1.0.onnx", "models/voices-v1.0.bin") #Takes 1-3sec to generate voice, needs good cpu to load fast
         #tried quantized model => 8int not recommended, takes forever (20-40sec)
 

@@ -11,9 +11,13 @@ from chair_vision import ChairVision, ChairMemory
 from audio_logic import ChairAudio
 from hud_elements import add_infoText
 from state import ChairState
-
+import urllib
+import sys
 #Notes:
 # - 
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+target_dir = os.path.join(script_dir, "models")
 
 WINDOW_NAME = "BICKERING CHAIR"
 ctypes.windll.shcore.SetProcessDpiAwareness(1)
@@ -203,11 +207,57 @@ class InteractiveChair:
         os._exit(0)
 
 
+class DownloadHelper():  
+    #Just had Gemini generate the basic download-code and adapted it (links, input, filesize, one-line-percentage-display) 
+    def download_progress(self, count, block_size, total_size):
+        if total_size > 0:
+            percent = int(count * block_size * 100 / total_size)
+            percent = min(100, percent)
+            bar_length = 50
+            filled_length = int(bar_length * percent // 100)
+            bar = '█' * filled_length + '░' * (bar_length - filled_length)
+            sys.stdout.write(f"\rProgress: |{bar}| {percent}%")
+            sys.stdout.flush()
+
+    def download(self):
+        #Tested it and at least for me using the GPU-model with CPU-Provider wasn't much slower than the CPU standard Model, so I didn't add it here since it also has (310mb)
+        files_to_download = {
+            "kokoro-v1.0.fp16-gpu.onnx": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.fp16-gpu.onnx",
+            "voices-v1.0.bin": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin"
+        }
+        
+        print("-----------[APPLICATION START]-----------------")
+        print("The Application relies on the following files to work, please allow the download if prompted!")
+        print("Checking for Kokoro-Files...")
+        for local_filename, download_url in files_to_download.items():
+            destination_path = os.path.join(target_dir, local_filename)
+            if not os.path.exists(destination_path):
+                if "gpu" in local_filename:
+                    file_size = "169MB"
+                else:
+                    file_size = "27MB"
+
+                answ = input(f"\n⚠️  [INFO] Do you want to allow to download \n'{local_filename}' \ninto \n'{destination_path}'?\n{file_size} is required!\nType y/n: ")
+                if answ.lower() != "y":
+                    os._exit(0)
+                print(f"\ndownloading '{local_filename}'...")
+                try:
+                    urllib.request.urlretrieve(download_url, destination_path, reporthook=self.download_progress)
+                    print(f"\nFinished! Saved at: {destination_path}")
+                except Exception as e:
+                    print(f"\nError downloading{local_filename}: {e}")
+            else:
+                print(f"Already Exists: {destination_path}")
+        print("\n[Info] Kokoro should be usable!\nIgnore CUDA/onnxRuntime-Error, should just load with CPU, it's slower, but should work\n----------------------------------")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--character_A", type=str, default=Characters.NICE.name)
     parser.add_argument("--character_B", type=str, default=None)
     args = parser.parse_args()
+
+    DownloadHelper().download()
 
     chair = InteractiveChair(args.character_A, args.character_B)
     chair.run()

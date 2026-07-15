@@ -28,6 +28,9 @@ class ChairVision:
     def __init__(self, expected_chars):
         self.start_time = time.perf_counter()
         self.cap = cv2.VideoCapture(0)
+        if not self.cap.isOpened():
+            print("No cam found, shutting down...")
+            os._exit(0)
         self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
         self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
         self.cam_width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -36,7 +39,7 @@ class ChairVision:
         self.chair_A_occupied = 0
         self.chair_B_occupied = 0
         
-        loaded_data = np.load(f"faces/faces_whole.npz")
+        loaded_data = np.load(f"{SCRIPT_DIR}/faces/faces_whole.npz")
         self.known_face_names = list(loaded_data.keys())
         self.known_face_encodings = [loaded_data[name] for name in self.known_face_names]
         self.ai_know_faces = set()
