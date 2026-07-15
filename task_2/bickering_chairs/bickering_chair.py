@@ -42,8 +42,9 @@ class InteractiveChair:
         self.setup_character(characterA, characterB)
 
         cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
-        cv2.resizeWindow(WINDOW_NAME, SCREEN_WIDTH, SCREEN_HEIGHT-20)
-        cv2.moveWindow(WINDOW_NAME,0,0)
+        #cv2.resizeWindow(WINDOW_NAME, SCREEN_WIDTH, SCREEN_HEIGHT-20)
+        #cv2.moveWindow(WINDOW_NAME,0,0)
+        cv2.setWindowProperty(WINDOW_NAME, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
     def get_random_character(self):
         char_list = list(Characters)
@@ -99,7 +100,7 @@ class InteractiveChair:
             self.ai_logic.generate_conversation(
                 self.state, chair_memory
             )
-            self.state.set_random_mood_time(1,3)
+            self.state.set_random_mood_time(1,2)
             self.state.set_random_comment_time()
             self.state.block_response = False
 

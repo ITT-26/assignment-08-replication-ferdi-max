@@ -34,7 +34,7 @@ class ChairState:
     
     #So values get set when creating objekt, not when compiling
     def __post_init__(self):
-        self.next_comment_time = time.time() + 10
+        self.next_comment_time = time.time() + 30
         self.next_mood_time = time.time() + 11 #Very first reaction shouldn't be mood, after first normal reaction mood quicker, so model recognizes mood as a reaction to what was said
 
     def get_Nmbr_of_all_faces(self) -> int:
@@ -43,5 +43,5 @@ class ChairState:
     def set_random_comment_time(self, min_sec=10, max_sec=15):
         self.next_comment_time = time.time() + randint(min_sec, max_sec)
 
-    def set_random_mood_time(self, min_sec=5, max_sec=10):
+    def set_random_mood_time(self, min_sec=1, max_sec=2):
         self.next_mood_time = time.time() + randint(min_sec, max_sec)

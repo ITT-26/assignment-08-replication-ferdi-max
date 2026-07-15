@@ -4,7 +4,7 @@
 ## Requirements
 - Was tested with **Python 3.12**,  
 but should work with any version that supports mediapipe, ollama and the other dependencies
-- Graphic-Card with min 5GB of VRAM is strongly recommended (developed on rtx5050, should work with RAM or Mac M-Chips but slower)
+- Graphic-Card with min 5GB of VRAM is strongly recommended (developed on rtx4070/rtx5050, should work with RAM or Mac M-Chips but slower)
 - install ollama [Download Ollama](https://ollama.com/download)
 - to pull llama3.1 (requires 4.9gb of space and vram, or a Mac M-Chip + RAM),  
 open command and run
@@ -149,4 +149,4 @@ So the downsizing to few states from the original paper makes a lot of sense, bu
 - Getting all the requirements to work took some time, especially getting Kokoru to run on the GPU, since installing the CUDA-Toolkit wasn't enough because of a change in the file-structure all relevant files had to be copied to a different directory manually
 - Face recognition sometimes works like a charm, at other times detect the wrong face
 - The Performance-Impact of more people couldn't be testet properly
-- 
+- I underestimated how long the combined inferencetime of all models is (For RTX 4070/i7 10700 during development it was faster than rtx 5050/ryzen 5)
