@@ -51,19 +51,26 @@ Special gestures can be used to edit the current sentence:
 
 - **Next Word:** Draw the ampersand gesture (`&`) to insert a space and continue with the next word.
 
-  **TODO: Insert screenshot of the Next Word gesture.**
-
+<p align="center">
+  <img src="docs/and.png" width="500">
+</p>
 - **End Sentence:** Draw the sentence-ending gesture to add a period.
 
-  **TODO: Insert screenshot of the End Sentence gesture.**
+  <p align="center">
+  <img src="docs/period.png" width="500">
+</p>
 
 - **Delete Letter:** Draw the delete gesture to remove the previously recognized letter.
 
-  **TODO: Insert screenshot of the Delete Letter gesture.**
+  <p align="center">
+  <img src="docs/delete.png" width="500">
+</p>
 
 - **Restart:** Draw the restart-arrow gesture to clear the complete sentence and start again.
 
-  **TODO: Insert screenshot of the Restart gesture.**
+  <p align="center">
+  <img src="docs/restart.png" width="500">
+</p>
 
 ## Toolbar
 
