@@ -25,6 +25,9 @@ The application supports three optional command-line arguments:
 - `--mediapipe_model PATH`  
   Sets the path to the MediaPipe `hand_landmarker.task` model. If this argument is not provided, the default model path is used.
 
+- `--nowrite`
+  Disbales letter recognition. Only for drawing  
+
 Example:
 
     python app.py --macOS
