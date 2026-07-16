@@ -22,9 +22,11 @@ parser.add_argument('--xml_logs', type=str, default=os.path.join(BASE_DIR, "data
                     help='Path to XML logs for training the recognizer')
 parser.add_argument('--mediapipe_model', type=str, default=os.path.join(BASE_DIR, "hand_landmarker.task"),
                     help='Path to MediaPipe Hand Landmark model')
+parser.add_argument('--nowrite', action='store_true',
+                    help='Disable writing functionality')
 args = parser.parse_args()
 
-
+no_write = args.nowrite
 mac_os = args.mac_os
 
 MEDIAPIPE_HAND_LANDMARK_MODEL_PATH = args.mediapipe_model
@@ -106,8 +108,9 @@ class HandDetector:
 
 class WritingApp:
 
-    def __init__(self, video_id=0, mac_os=mac_os):
+    def __init__(self, video_id=0, mac_os=mac_os, nowrite=no_write):
         self.video_id = video_id
+        self.nowrite = nowrite
         self.detector = HandDetector()
         self.recognizer = DollarRecognizer()
         train_recognizer(self.recognizer)
@@ -205,11 +208,11 @@ class WritingApp:
                 cv2.circle(frame, self.reference_point,
                            self.pen_size, self.selected_color, -1)
             self.draw_points(frame)
-            if self.info_text is not None:
+            if self.info_text is not None and self.nowrite is False:
                 cv2.putText(frame, f"{self.info_text}", (10, 400),
                             cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2, cv2.LINE_AA)
 
-            if self.sentence is not None:
+            if self.sentence is not None and self.nowrite is False:
                 cv2.putText(frame, f"{self.sentence}", (10, self.height - 150),
                             cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2, cv2.LINE_AA)
 
@@ -328,6 +331,9 @@ class WritingApp:
             return
 
         points_copy = self.convert_stroke_to_points()
+        if self.nowrite:
+            self.current_stroke.clear()
+            return
         result = self.recognizer.recognize(points_copy, useProtractor=False)
         self.handle_recognition_result(result)
 
