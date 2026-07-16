@@ -127,6 +127,7 @@ class WritingApp:
         self.pen_down_frame = 0
         self.pen_down_frames_threshold = 5
         self.sentence = ""
+        self.fps = 0
         if mac_os:
             self.window = pyglet.window.Window(
                 (self.width // 2), (self.height // 2))
@@ -212,6 +213,9 @@ class WritingApp:
                 cv2.putText(frame, f"{self.sentence}", (10, self.height - 150),
                             cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 255, 0), 2, cv2.LINE_AA)
 
+            cv2.putText(frame, f"FPS: {self.fps:.1f}",
+                        (10, self.height - 100), cv2.FONT_HERSHEY_SIMPLEX,
+                        1, (0, 255, 0), 1, cv2.LINE_AA)
             img = cv2glet(frame, 'BGR')
             img.blit(0, 0, 0)
 
@@ -241,6 +245,7 @@ class WritingApp:
             # Hand is detetected, get the reference point and check if it's in the writing region
             self.reference_point = self.get_reference_point(hand_landmarks)
 
+            # The pen down logic was assisted by ChatGPT
             if self.reference_point[1] >= self.height * self.region_factor:
                 # Hand is in the writing region, check if it's writing or erasing
                 extended_fingers = self.get_extended_fingers(hand_landmarks)
