@@ -1,5 +1,12 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-22041afd0340ce965d47ae6ef1cefeee28c7c493a6346c4f15d667ab976d596c.svg)](https://classroom.github.com/a/sPpq67Dc)
 
+# Table of Contents
+
+| Task | Name |
+|-|-|
+| 00 | [Requirements](#requirements)
+| 01 | [Bickering Chairs](#01-bickering-chairs) |
+| 02 | [Documentation](#02-documentation) |
 
 ## Requirements
 - Was tested with **Python 3.12**,  
@@ -45,13 +52,6 @@ source venv/bin/activate
 pip install -r requirements.txt
 ````
 <hr style="border: 2px solid #444; margin: 60px 0;">
-
-# Table of Contents
-
-| Task | Name |
-|-|-|
-| 01 | [Bickering Chairs](#01-bickering-chairs) |
-| 02 | [Documentation](#02-documentation) |
 
 
 # 01: Bickering Chairs
