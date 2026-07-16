@@ -47,7 +47,7 @@ https://doi.org/10.1145/3776734.3794604
 At first, we planned to implement and extend the *Bickering Benches* project using computer vision. Ferdi started working on the implementation on the first weekend because Max was busy at that time. However, the project had demanding technical requirements, including a dedicated GPU, many dependencies, and additional C++ build tools. As a result, Max could not run the project reliably on his system.
 
 We therefore decided to keep the existing *Bickering Bench* prototype and focus on making it run reliably. In addition, we chose to implement a second paper so that the work on the first project was not lost and both team members could contribute to the assignment.  
-Readme for this process can be found [Here](../task_2/bickering_chairs/README.md#Documentation)
+Readme for this process can be found [Here](../task_2/bickering_chairs/README.md#02-documentation)
 
 ## Finding a Second Paper
 
