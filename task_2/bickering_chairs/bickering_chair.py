@@ -91,7 +91,7 @@ class InteractiveChair:
             print(f"Ollama Error: {e}")
         finally:
             self.state.set_random_comment_time(10,15)
-            self.state.set_random_mood_time(3,5)
+            self.state.set_random_mood_time()
             self.state.block_response = False
 
     def conversation_worker(self, frame):
@@ -100,7 +100,7 @@ class InteractiveChair:
             self.ai_logic.generate_conversation(
                 self.state, chair_memory
             )
-            self.state.set_random_mood_time(1,2)
+            self.state.set_random_mood_time(1,3)
             self.state.set_random_comment_time()
             self.state.block_response = False
 
@@ -113,7 +113,7 @@ class InteractiveChair:
             print(f"Ollama Mood Error: {e}")
         finally:
             self.state.set_random_comment_time(7,15)
-            self.state.set_random_mood_time(5,10)
+            self.state.set_random_mood_time(8,12)
             self.state.block_response = False
             
 

@@ -31,7 +31,6 @@ class ChairAILogic:
         if state.bystanders > 0:           
             bystander_lines = [f"From the {state.bystanders} bystanders:"]
             if len(chairMemory.names_On_Bystanders) > 0:
-                bystander_lines.append("Names and Actions of specific bystanders are:")
                 for note in chairMemory.names_On_Bystanders:
                     bystander_lines.append(f"- {note.strip()}")
 
@@ -117,8 +116,11 @@ class ChairAILogic:
 
         system_prompt_A = (
             f"<CORE_IDENTITY>\n"
-            f"YOU ARE Chair A, a sentient piece of furniture. This is your absolute identity. "
+            f"YOU ARE Chair A, a sentient piece of furniture. This is your absolute identity.\n"
             f"Always respond from the perspective of a chair! Never confuse yourself with the humans or Chair B.\n"
+            f"Always talk to people directly!\n"
+            f"You can't do anything but talk! No moving cushions or anything else like that!\n"
+            f"Don't invent or talk about things you don't know!\n"
             f"</CORE_IDENTITY>\n\n"
             f"Personality:\n{state.character_A.value.prompt}"
         )
@@ -154,7 +156,9 @@ class ChairAILogic:
                 f"<CORE_IDENTITY>\n"
                 f"YOU ARE Chair B, a sentient piece of furniture. This is your absolute identity. "
                 f"You are currently conversing with Chair A. Never confuse Chair A or yourself with the humans!\n"
-                f"</CORE_IDENTITY>\n\n"
+                f"Always talk to people directly!\n"
+                f"You can't do anything but talk! No moving cushions or anything else like that!\n"
+                f"Don't invent or talk about things you don't know!\n"                f"</CORE_IDENTITY>\n\n"
                 f"Personality:\n{state.character_B.value.prompt}"
             )
             #print(f"COMPLETE PROMPT B:\n{system_prompt_B}\n{self.history_B}\n{context_for_B}")
@@ -186,6 +190,9 @@ class ChairAILogic:
             f"<CORE_IDENTITY>\n"
             f"YOU ARE Chair {char_letter}, a sentient piece of furniture. This is your absolute identity. "
             f"Always respond from this perspective! Never confuse yourself with the humans sitting on you.\n"
+            f"Always talk to people directly!\n"
+            f"You can't do anything but talk! No moving cushions or anything else like that!\n"
+            f"Don't invent or talk about things you don't know!\n"
             f"</CORE_IDENTITY>\n\n"
             f"Personality:\n{character.value.prompt}"
         )
@@ -225,7 +232,9 @@ class ChairAILogic:
     def answer_request(self, state:ChairState, vision:ChairVision):
         request_text = self.speaker.listen(state)
         
-        if not request_text:
+        if not request_text or request_text == "":
+            state.listening = False
+            state.talking_person = -1
             return
         
         print(f"{state.talking_person} IS TALKING!!!!!")
@@ -251,8 +260,11 @@ class ChairAILogic:
 
         system_prompt = (
             f"<CORE_IDENTITY>\n"
-            f"YOU ARE Chair {char_letter}, a sentient piece of furniture. This is your absolute identity. "
+            f"YOU ARE Chair {char_letter}, a sentient piece of furniture. This is your absolute identity.\n"
             f"Always respond from this perspective! Never confuse yourself with the humans sitting on you.\n"
+            f"Always talk to people directly!\n"
+            f"You can't do anything but talk! No moving cushions or anything else like that!\n"
+            f"Don't invent or talk about things you don't know!\n"
             f"</CORE_IDENTITY>\n\n"
             f"Personality:\n{character.value.prompt}"
         )

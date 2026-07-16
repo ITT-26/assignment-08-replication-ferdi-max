@@ -43,5 +43,5 @@ class ChairState:
     def set_random_comment_time(self, min_sec=10, max_sec=15):
         self.next_comment_time = time.time() + randint(min_sec, max_sec)
 
-    def set_random_mood_time(self, min_sec=1, max_sec=2):
+    def set_random_mood_time(self, min_sec=0, max_sec=1):
         self.next_mood_time = time.time() + randint(min_sec, max_sec)
