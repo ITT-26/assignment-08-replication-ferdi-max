@@ -24,10 +24,13 @@ parser.add_argument('--mediapipe_model', type=str, default=os.path.join(BASE_DIR
                     help='Path to MediaPipe Hand Landmark model')
 parser.add_argument('--nowrite', action='store_true',
                     help='Disable writing functionality')
+parser.add_argument('--fullscreen', action='store_true',
+                    help='Run the application in fullscreen mode')
 args = parser.parse_args()
 
 no_write = args.nowrite
 mac_os = args.mac_os
+fullscreen = args.fullscreen
 
 MEDIAPIPE_HAND_LANDMARK_MODEL_PATH = args.mediapipe_model
 XML_LOGS = args.xml_logs
@@ -108,9 +111,10 @@ class HandDetector:
 
 class WritingApp:
 
-    def __init__(self, video_id=0, mac_os=mac_os, nowrite=no_write):
+    def __init__(self, video_id=0, mac_os=mac_os, nowrite=no_write, fullscreen=fullscreen):
         self.video_id = video_id
         self.nowrite = nowrite
+        self.fullscreen = fullscreen
         self.detector = HandDetector()
         self.recognizer = DollarRecognizer()
         train_recognizer(self.recognizer)
@@ -132,10 +136,16 @@ class WritingApp:
         self.sentence = ""
         self.fps = 0
         if mac_os:
-            self.window = pyglet.window.Window(
-                (self.width // 2), (self.height // 2))
+            if self.fullscreen:
+                self.window = pyglet.window.Window(fullscreen=True)
+            else:
+                self.window = pyglet.window.Window(
+                    (self.width // 2), (self.height // 2))
         else:
-            self.window = pyglet.window.Window(self.width, self.height)
+            if self.fullscreen:
+                self.window = pyglet.window.Window(fullscreen=True)
+            else:
+                self.window = pyglet.window.Window(self.width, self.height)
         self.setup_tools()
 
     def setup_tools(self):
@@ -220,7 +230,7 @@ class WritingApp:
                         (10, self.height - 100), cv2.FONT_HERSHEY_SIMPLEX,
                         1, (0, 255, 0), 1, cv2.LINE_AA)
             img = cv2glet(frame, 'BGR')
-            img.blit(0, 0, 0)
+            img.blit(0, 0, width=self.window.width, height=self.window.height)
 
     def draw_points(self, frame):
         points_to_draw = list(self.points)

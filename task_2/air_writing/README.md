@@ -28,6 +28,9 @@ The application supports three optional command-line arguments:
 - `--nowrite`
   Disbales letter recognition. Only for drawing  
 
+- `--fullscreen``
+  Starts application in full screen  
+
 Example:
 
     python app.py --macOS
